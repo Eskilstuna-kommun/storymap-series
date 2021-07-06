@@ -564,10 +564,13 @@ define(["lib-build/css!lib-app/bootstrap/css/bootstrap.min",
 				initError("invalidConfigNoApp");
 		}
 
+		function isMobileBrowser(){
+			return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|Opera Mini|IEMobile/i).test(navigator.userAgent);
+		}
+
 		function loadWebMappingApp(appId)
 		{
 			console.log("common.core.Core - loadWebMappingApp - appId:", appId);
-
 			var forceLogin = _urlParams.forceLogin !== undefined;
 
 			// If forceLogin parameter in URL OR builder
@@ -638,6 +641,15 @@ define(["lib-build/css!lib-app/bootstrap/css/bootstrap.min",
 		{
 			var itemRq = response.item,
 				dataRq = response.itemData;
+
+			//Redirect mobile/tablet devices to the first webpage in the seriess
+			if(isMobileBrowser()){
+				var storyEntries = dataRq.values.story.entries;
+				if(storyEntries.length > 0){
+					var redirectUrl = storyEntries[0].media.webpage.url;
+					window.location.replace(redirectUrl);
+				}
+			}					
 
 			app.data.setWebAppItem(itemRq);
 
@@ -775,7 +787,7 @@ define(["lib-build/css!lib-app/bootstrap/css/bootstrap.min",
 
 		function webMapInitCallback(response)
 		{
-			console.log("common.core.Core - webMapInitCallback");
+			console.log("common.core.Core - webMapInitCallback");		
 
 			app.maps[response.itemInfo.item.id] = _mainView.getMapConfig(response);
 			app.map = response.map;
